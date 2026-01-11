@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const Register = () => {
     const navigate = useNavigate();
@@ -15,72 +13,57 @@ const Register = () => {
     const handleFormSubmit = async (e) => {
         e.preventDefault();
 
-        if (!name || !email || !password) {
-            toast.error("All fields required");
-            return;
-        }
-
         try {
             setLoading(true);
 
-            const res = await axios.post(
+            await axios.post(
                 `${import.meta.env.VITE_BACKEND_URL}/userapi/reguser`,
-                { name, email, password },
-                { withCredentials: true }
+                { name, email, password }
             );
 
-            toast.success("Registered Successfully");
+            alert("Registered successfully");
 
-            // Redirect to login after register
-            setTimeout(() => {
-                navigate("/login");
-            }, 1500);
-
+            navigate("/login");
         } catch (err) {
-            toast.error(err?.response?.data?.msg || "Registration failed");
+            alert("Registration failed");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <>
-            <ToastContainer />
-            <div className="form-container">
-                <h2>Registration</h2>
+        <div>
+            <h2>Register</h2>
 
-                <form onSubmit={handleFormSubmit}>
-                    <input
-                        type="text"
-                        placeholder="Name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
+            <form onSubmit={handleFormSubmit}>
+                <input
+                    placeholder="Name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                />
 
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
+                <input
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
 
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
 
-                    <button type="submit" disabled={loading}>
-                        {loading ? "Registering..." : "Register"}
-                    </button>
-                </form>
+                <button type="submit" disabled={loading}>
+                    Register
+                </button>
+            </form>
 
-                <p>
-                    Already have account? <Link to="/login">Login</Link>
-                </p>
-            </div>
-        </>
+            <p>
+                Already have account? <Link to="/login">Login</Link>
+            </p>
+        </div>
     );
 };
 
