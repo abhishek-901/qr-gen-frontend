@@ -7,7 +7,11 @@ import 'react-toastify/dist/ReactToastify.css'
 
 const Login = () => {
     const navigate = useNavigate();
-    const [userdt, setUserdt] = useState({ uemail: '', upass: '' });
+
+    const [userdt, setUserdt] = useState({
+        uemail: '',
+        upass: ''
+    });
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -19,20 +23,18 @@ const Login = () => {
 
         try {
             const res = await axios.post(
-                "https://ultimateqrbackend-sigma.vercel.app/userapi/loginuser",
-                formData,
-                { withCredentials: true }
+                `${import.meta.env.VITE_BACKEND_URL}/userapi/loginuser`,
+                userdt
             );
 
             localStorage.setItem("token", res.data.token);
 
             toast.success("Login successful");
-            navigate("/dashboard");   // 👈 AUTO DASHBOARD
+            navigate("/dashboard");
         } catch (err) {
             toast.error("Login failed");
         }
     };
-
 
     return (
         <div className="flex justify-center items-center h-screen bg-gray-100">
@@ -43,17 +45,18 @@ const Login = () => {
             <ToastContainer position="top-center" autoClose={2000} />
 
             <div className="bg-white shadow-lg p-6 rounded-lg w-[350px]">
-
                 <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
-                <form onSubmit={handleFormSubmit}>
+                {/* 🔥 THIS IS THE FIX */}
+                <form onSubmit={handleLogin}>
                     <input
                         type="email"
                         name="uemail"
                         placeholder="Enter Email"
                         required
+                        value={userdt.uemail}
                         onChange={handleInputChange}
-                        className="w-full p-2 border rounded mb-3 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full p-2 border rounded mb-3"
                     />
 
                     <input
@@ -61,21 +64,20 @@ const Login = () => {
                         name="upass"
                         placeholder="Enter Password"
                         required
+                        value={userdt.upass}
                         onChange={handleInputChange}
-                        className="w-full p-2 border rounded mb-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full p-2 border rounded mb-2"
                     />
 
-                    {/* ✅ Forgot Password */}
                     <div className="flex justify-end mb-4">
                         <Link to="/forgot-password" className="text-blue-500 hover:underline">
                             Forgot Password?
                         </Link>
-
                     </div>
 
                     <button
                         type="submit"
-                        className="w-full bg-green-800 text-white font-bold py-2 rounded hover:bg-green-700 transition"
+                        className="w-full bg-green-800 text-white font-bold py-2 rounded"
                     >
                         Login
                     </button>
