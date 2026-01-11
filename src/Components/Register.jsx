@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
+import { Helmet } from "react-helmet-async";
 import "react-toastify/dist/ReactToastify.css";
 
 const Register = () => {
@@ -23,7 +24,7 @@ const Register = () => {
         try {
             setLoading(true);
 
-            const res = await axios.post(
+            await axios.post(
                 `${import.meta.env.VITE_BACKEND_URL}/userapi/reguser`,
                 { name, email, password },
                 { withCredentials: true }
@@ -31,7 +32,6 @@ const Register = () => {
 
             toast.success("Registered Successfully");
 
-            // Redirect to login after register
             setTimeout(() => {
                 navigate("/login");
             }, 1500);
@@ -44,43 +44,62 @@ const Register = () => {
     };
 
     return (
-        <>
-            <ToastContainer />
-            <div className="form-container">
-                <h2>Registration</h2>
+        <div className="flex justify-center items-center h-screen bg-gray-100">
+            <Helmet>
+                <title>Register | QR App</title>
+            </Helmet>
+
+            <ToastContainer position="top-right" autoClose={2000} />
+
+            <div className="bg-white shadow-lg p-6 rounded-lg w-[350px]">
+
+                <h2 className="text-2xl font-bold mb-6 text-center text-green-800">
+                    Create Account
+                </h2>
 
                 <form onSubmit={handleFormSubmit}>
+
                     <input
                         type="text"
-                        placeholder="Name"
+                        placeholder="Enter Name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        className="w-full p-2 border rounded mb-3 focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
 
                     <input
                         type="email"
-                        placeholder="Email"
+                        placeholder="Enter Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        className="w-full p-2 border rounded mb-3 focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
 
                     <input
                         type="password"
-                        placeholder="Password"
+                        placeholder="Enter Password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        className="w-full p-2 border rounded mb-4 focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
 
-                    <button type="submit" disabled={loading}>
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-green-800 text-white font-bold py-2 rounded hover:bg-green-700 transition"
+                    >
                         {loading ? "Registering..." : "Register"}
                     </button>
                 </form>
 
-                <p>
-                    Already have account? <Link to="/login">Login</Link>
+                <p className="mt-4 text-center text-sm">
+                    Already have an account?
+                    <Link to="/login" className="text-blue-600 ml-1 hover:underline">
+                        Login
+                    </Link>
                 </p>
             </div>
-        </>
+        </div>
     );
 };
 
