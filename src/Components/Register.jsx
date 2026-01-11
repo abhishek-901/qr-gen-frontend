@@ -1,96 +1,87 @@
-import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import axios from 'axios'
-import { Helmet } from 'react-helmet-async'
-import { toast, ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
-
-// 🔥 Backend URL from .env (works for both localhost & Vercel)
-const BASE_URL = import.meta.env.VITE_BACKEND_URL
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Register = () => {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
-    const [userdt, setUserdt] = useState({
-        uname: '',
-        uemail: '',
-        upass: ''
-    })
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target
-        setUserdt({ ...userdt, [name]: value })
-    }
-
-    const handleSubmit = async (e) => {
+    const handleFormSubmit = async (e) => {
         e.preventDefault();
 
+        if (!name || !email || !password) {
+            toast.error("All fields required");
+            return;
+        }
+
         try {
+            setLoading(true);
+
             const res = await axios.post(
-                "https://ultimateqrbackend-sigma.vercel.app/userapi/reguser",
-                formData,
+                `${import.meta.env.VITE_BACKEND_URL}/userapi/reguser`,
+                { name, email, password },
                 { withCredentials: true }
             );
 
-            toast.success("Registered successfully");
-            navigate("/login");   // 👈 AUTO REDIRECT
+            toast.success("Registered Successfully");
+
+            // Redirect to login after register
+            setTimeout(() => {
+                navigate("/login");
+            }, 1500);
+
         } catch (err) {
-            toast.error(err.response?.data?.message || "Register failed");
+            toast.error(err?.response?.data?.msg || "Registration failed");
+        } finally {
+            setLoading(false);
         }
     };
 
-
     return (
-        <div className='flex justify-center items-center h-screen bg-gray-100'>
-            <Helmet><title>Register | Mern Crash Course</title></Helmet>
-            <ToastContainer position="top-right" autoClose={2000} />
+        <>
+            <ToastContainer />
+            <div className="form-container">
+                <h2>Registration</h2>
 
-            <div className='bg-white shadow-md p-6 rounded-b-lg w-96'>
-                <h2 className='text-2xl font-bold mb-4 text-center'>Registration</h2>
+                <form onSubmit={handleFormSubmit}>
+                    <input
+                        type="text"
+                        placeholder="Name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                    />
 
-                <input
-                    type='text'
-                    name='uname'
-                    placeholder='Enter username'
-                    required
-                    className='w-full p-2 border rounded mb-3'
-                    onChange={handleInputChange}
-                />
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
 
-                <input
-                    type='email'
-                    name='uemail'
-                    placeholder='Enter Email Id'
-                    required
-                    className='w-full p-2 border rounded mb-3'
-                    onChange={handleInputChange}
-                />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
 
-                <input
-                    type='password'
-                    name='upass'
-                    placeholder='Enter password'
-                    required
-                    className='w-full p-2 border rounded mb-3'
-                    onChange={handleInputChange}
-                />
+                    <button type="submit" disabled={loading}>
+                        {loading ? "Registering..." : "Register"}
+                    </button>
+                </form>
 
-                <button
-                    className='w-full bg-blue-500 text-white font-bold hover:bg-blue-700 p-2 rounded'
-                    onClick={handleFormSubmit}
-                >
-                    Register
-                </button>
-
-                <p className='mt-3 text-center'>
-                    Already have account?
-                    <Link to="/login" className='text-blue-500 hover:underline ml-1'>
-                        Login Here
-                    </Link>
+                <p>
+                    Already have account? <Link to="/login">Login</Link>
                 </p>
             </div>
-        </div>
-    )
-}
+        </>
+    );
+};
 
-export default Register
+export default Register;
