@@ -22,31 +22,23 @@ const Register = () => {
         setUserdt({ ...userdt, [name]: value })
     }
 
-    const handleFormSubmit = async (e) => {
-        e.preventDefault()
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
         try {
             const res = await axios.post(
-                `${BASE_URL}/userapi/reguser`,   // ✅ dynamic backend URL
-                userdt,
-                {
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                }
-            )
+                "https://ultimateqrbackend-sigma.vercel.app/userapi/reguser",
+                formData,
+                { withCredentials: true }
+            );
 
-            toast.success(res.data.msg)
-
-            setTimeout(() => {
-                navigate("/login")
-            }, 1500)
-
-        } catch (error) {
-            console.error(error)
-            toast.error(error.response?.data?.msg || "Registration failed")
+            toast.success("Registered successfully");
+            navigate("/login");   // 👈 AUTO REDIRECT
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Register failed");
         }
-    }
+    };
+
 
     return (
         <div className='flex justify-center items-center h-screen bg-gray-100'>

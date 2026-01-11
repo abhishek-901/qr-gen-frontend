@@ -14,23 +14,25 @@ const Login = () => {
         setUserdt({ ...userdt, [name]: value });
     };
 
-    const handleFormSubmit = async (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        try {
-            const res = await axios.post("http://localhost:5000/userapi/loguser", userdt);
 
-            if (res.data.loginsts === "0") {
-                localStorage.setItem("utoken", res.data.token);
-                toast.success(res.data.msg, {
-                    onClose: () => navigate("/dashboard")
-                });
-            } else {
-                toast.error(res.data.msg);
-            }
+        try {
+            const res = await axios.post(
+                "https://ultimateqrbackend-sigma.vercel.app/userapi/loginuser",
+                formData,
+                { withCredentials: true }
+            );
+
+            localStorage.setItem("token", res.data.token);
+
+            toast.success("Login successful");
+            navigate("/dashboard");   // 👈 AUTO DASHBOARD
         } catch (err) {
-            toast.error(err.response?.data?.msg || "Login failed");
+            toast.error("Login failed");
         }
     };
+
 
     return (
         <div className="flex justify-center items-center h-screen bg-gray-100">
@@ -41,6 +43,7 @@ const Login = () => {
             <ToastContainer position="top-center" autoClose={2000} />
 
             <div className="bg-white shadow-lg p-6 rounded-lg w-[350px]">
+
                 <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
                 <form onSubmit={handleFormSubmit}>
