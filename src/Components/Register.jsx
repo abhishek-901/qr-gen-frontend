@@ -30,7 +30,9 @@ const Register = () => {
                     uname: name,
                     uemail: email,
                     upass: password
-                }
+                },
+                { withCredentials: true }
+
             );
 
             console.log("REGISTER RESPONSE:", res.data);

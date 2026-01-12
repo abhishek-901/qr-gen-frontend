@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
+import { QRCodeCanvas } from "qrcode.react";
 import "react-toastify/dist/ReactToastify.css";
 
 const AllLinqQR = () => {
@@ -12,12 +13,9 @@ const AllLinqQR = () => {
     const fetchQrlinks = async () => {
         try {
             const token = localStorage.getItem("utoken");
-            const { data } = await axios.get(
-                "http://localhost:5000/userapi/getqrlinks",
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
+            const { data } = await axios.get("http://localhost:5000/userapi/getqrlinks", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setQrlinks(data.qrlinks || []);
         } catch {
             toast.error("Failed to load QR");
@@ -36,10 +34,10 @@ const AllLinqQR = () => {
         try {
             const token = localStorage.getItem("utoken");
             await axios.delete(`http://localhost:5000/userapi/deleteqr/${id}`, {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: { Authorization: `Bearer ${token}` }
             });
 
-            setQrlinks((prev) => prev.filter((qr) => qr._id !== id));
+            setQrlinks(prev => prev.filter(qr => qr._id !== id));
             toast.success("QR Deleted");
         } catch {
             toast.error("Delete Failed");
@@ -59,75 +57,70 @@ const AllLinqQR = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 p-4 flex justify-center">
+        <div className="min-h-screen bg-gray-100 p-4">
             <ToastContainer position="top-center" autoClose={2000} />
 
-            {/* Centered narrow container */}
-            <div className="w-full max-w-4xl">
-                <h2 className="text-2xl font-bold text-center mb-6">
-                    My QR Links
-                </h2>
+            <h2 className="text-2xl font-bold text-center mb-6">My QR Links</h2>
 
-                <div className="bg-white shadow-md rounded-lg overflow-hidden">
-                    {/* Desktop Header */}
-                    <div className="hidden md:grid grid-cols-4 bg-slate-800 text-white text-center font-semibold p-3">
-                        <div>QR</div>
-                        <div>Color</div>
-                        <div>Status</div>
-                        <div>Actions</div>
-                    </div>
-
-                    {/* QR Rows */}
-                    {qrlinks.map((qr) => (
-                        <div
-                            key={qr._id}
-                            className="grid grid-cols-1 md:grid-cols-4 gap-3 items-center text-center p-4 border-b hover:bg-gray-50"
-                        >
-                            {/* QR */}
-                            <div className="flex justify-center">
-                                <img
-                                    className="h-20 w-20 border rounded"
-                                    src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${qr.qrlink}&color=${qr.qrcolor.replace(
-                                        "#",
-                                        ""
-                                    )}`}
-                                    alt="qr"
-                                />
-                            </div>
-
-                            {/* Color */}
-                            <div className="font-mono text-sm">{qr.qrcolor}</div>
-
-                            {/* Status */}
-                            <div className="capitalize font-semibold text-gray-700">
-                                {qr.qr_status}
-                            </div>
-
-                            {/* Actions */}
-                            <div className="flex justify-center gap-2">
-                                <button
-                                    onClick={() => handleEdit(qr._id)}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded"
-                                >
-                                    Edit
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(qr._id)}
-                                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded"
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-
-                    {qrlinks.length === 0 && (
-                        <p className="text-center p-6 text-gray-500">
-                            No QR Links Found
-                        </p>
-                    )}
+            {/* DESKTOP TABLE */}
+            <div className="hidden md:block bg-white rounded-lg shadow">
+                <div className="grid grid-cols-4 bg-slate-800 text-white p-4 font-semibold text-center">
+                    <div>QR</div>
+                    <div>Color</div>
+                    <div>Status</div>
+                    <div>Actions</div>
                 </div>
+
+                {qrlinks.map(qr => (
+                    <div
+                        key={qr._id}
+                        className="grid grid-cols-4 items-center text-center p-4 border-b hover:bg-gray-50"
+                    >
+                        <div className="flex justify-center">
+                            <QRCodeCanvas value={qr.qrlink} size={70} fgColor={qr.qrcolor} />
+                        </div>
+                        <div className="font-mono">{qr.qrcolor}</div>
+                        <div>{qr.qr_status}</div>
+                        <div className="space-x-2">
+                            <button onClick={() => handleEdit(qr._id)} className="bg-blue-600 text-white px-3 py-1 rounded">Edit</button>
+                            <button onClick={() => handleDelete(qr._id)} className="bg-red-600 text-white px-3 py-1 rounded">Delete</button>
+                        </div>
+                    </div>
+                ))}
             </div>
+
+            {/* MOBILE CARDS */}
+            <div className="md:hidden space-y-4">
+                {qrlinks.map(qr => (
+                    <div key={qr._id} className="bg-white p-4 rounded-lg shadow">
+                        <div className="flex justify-center mb-3">
+                            <QRCodeCanvas value={qr.qrlink} size={100} fgColor={qr.qrcolor} />
+                        </div>
+
+                        <p className="text-center text-sm text-gray-600 break-all">
+                            {qr.qrlink}
+                        </p>
+
+                        <div className="flex justify-between mt-3 text-sm">
+                            <span className="font-mono">{qr.qrcolor}</span>
+                            <span>{qr.qr_status}</span>
+                        </div>
+
+                        <div className="flex justify-between mt-4">
+                            <button onClick={() => handleEdit(qr._id)} className="bg-blue-600 text-white px-4 py-1 rounded w-1/2 mr-2">
+                                Edit
+                            </button>
+                            <button onClick={() => handleDelete(qr._id)} className="bg-red-600 text-white px-4 py-1 rounded w-1/2">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {qrlinks.length === 0 && (
+                <p className="text-center text-gray-500 mt-10">No QR Links Found</p>
+            )}
         </div>
     );
 };

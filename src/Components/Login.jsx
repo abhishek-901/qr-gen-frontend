@@ -28,6 +28,10 @@ const Login = () => {
             );
 
             localStorage.setItem("token", res.data.token);
+            navigate("/dashboard");
+
+
+            localStorage.setItem("token", res.data.token);
 
             toast.success("Login successful");
             navigate("/dashboard");

@@ -3,7 +3,8 @@ import { jwtDecode } from "jwt-decode";   // 👈 v4 ka sahi import
 import Navbar from "./Components/Navbar";
 
 const ProtectedRoute = () => {
-    const token = localStorage.getItem("utoken");
+    const token = localStorage.getItem("token");
+
 
     if (!token) return <Navigate to="/login" replace />;
 

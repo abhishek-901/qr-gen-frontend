@@ -8,15 +8,22 @@ const Navbar = () => {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
-        const token = localStorage.getItem("utoken");
+        const token = localStorage.getItem("token");
+
         try {
-            await axios.get("http://localhost:5000/userapi/logoutuser", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            await axios.get(
+                `${import.meta.env.VITE_BACKEND_URL}/userapi/logoutuser`,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                    withCredentials: true
+                }
+            );
+
         } catch (error) {
             console.error("Logout Error:", error);
         } finally {
-            localStorage.removeItem("utoken");
+            localStorage.removeItem("token");
+
             navigate("/login");
         }
     };
