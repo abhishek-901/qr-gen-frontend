@@ -24,13 +24,18 @@ const Register = () => {
         try {
             setLoading(true);
 
-            await axios.post(
+            const res = await axios.post(
                 `${import.meta.env.VITE_BACKEND_URL}/userapi/reguser`,
-                { name, email, password },
-                { withCredentials: true }
+                {
+                    uname: name,
+                    uemail: email,
+                    upass: password
+                }
             );
 
-            toast.success("Registered Successfully");
+            console.log("REGISTER RESPONSE:", res.data);
+
+            toast.success(res.data?.msg || "Registered Successfully");
 
             setTimeout(() => {
                 navigate("/login");
